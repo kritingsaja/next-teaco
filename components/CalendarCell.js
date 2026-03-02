@@ -1,4 +1,4 @@
-import { getOccupancyStatus } from '@/lib/supabase'
+import { getOccupancyStatus } from '../lib/supabase'
 
 const levelConfig = {
   low: {
