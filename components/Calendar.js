@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import CalendarCell from './CalendarCell'
-import { getReservasiByMonth } from '@/lib/supabase'
+import { getReservasiByMonth } from '../lib/supabase'
 
 const BULAN = [
   'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
