@@ -1,6 +1,6 @@
-import Header from '@/components/Header'
-import InfoBar from '@/components/InfoBar'
-import Calendar from '@/components/Calendar'
+import Header from '../components/Header'
+import InfoBar from '../components/InfoBar'
+import Calendar from '../components/Calendar'
 
 export default function Home() {
   return (
