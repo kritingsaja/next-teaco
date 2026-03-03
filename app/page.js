@@ -27,7 +27,7 @@ export default function Home() {
         text-center
       ">
         <p className="text-xs text-stone-400 dark:text-stone-600 tracking-wider uppercase">
-          Reservasi Meja · Ramadan 1446 H · Tea Co & Resto
+          Cek Ketersediaan · Ramadan 1446 H · Tea Co +
         </p>
       </footer>
 
