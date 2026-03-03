@@ -68,7 +68,7 @@ export default function Calendar() {
             {BULAN[month]} {year}
           </h2>
           <p className="text-xs text-stone-400 dark:text-stone-500 mt-0.5">
-            Kapasitas: 60 pax per malam
+            
           </p>
         </div>
 
