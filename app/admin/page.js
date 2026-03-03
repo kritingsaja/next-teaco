@@ -103,7 +103,7 @@ export default function AdminPage() {
 
   // Check session
   useEffect(() => {
-    if (typeof window !== 'undefined' && sessionStorage.getItem('adm') === '1') setIsAdmin(true)
+    if (typeof window !== 'undefined' && localStorage.getItem('adm') === '1') setIsAdmin(true)
   }, [])
 
   // Check DB
@@ -143,7 +143,7 @@ export default function AdminPage() {
     if (!loginUser || !loginPass) { setLoginErr('Isi username dan password!'); return }
     if (loginUser === ADMIN_USER && loginPass === ADMIN_PASS) {
       setIsAdmin(true)
-      sessionStorage.setItem('adm', '1')
+      localStorage.setItem('adm', '1')
       setLoginOpen(false)
       setLoginUser(''); setLoginPass(''); setLoginErr('')
       showToast('✅ Login admin berhasil!')
@@ -155,7 +155,7 @@ export default function AdminPage() {
 
   const doLogout = () => {
     setIsAdmin(false)
-    sessionStorage.removeItem('adm')
+    localStorage.removeItem('adm')
     showToast('Keluar dari mode admin')
   }
 
@@ -269,14 +269,11 @@ export default function AdminPage() {
             <div style={{ width: 7, height: 7, borderRadius: '50%', background: dbStatus === 'ok' ? '#5cb85c' : dbStatus === 'err' ? '#8b3a3a' : '#c8a96e', boxShadow: dbStatus === 'ok' ? '0 0 6px rgba(92,184,92,.5)' : 'none' }} className={dbStatus === 'loading' ? 'db-blink' : ''} />
             {dbLabel}
           </div>
-          <a href="/" style={{ background: '#221f1a', border: '1px solid #2e2b25', color: '#7a7060', padding: '.3rem .75rem', borderRadius: '20px', cursor: 'pointer', fontSize: '.67rem', textDecoration: 'none', transition: 'all .15s' }}>← Kembali</a>
+          <a href="/" style={{ background: '#221f1a', border: '1px solid #2e2b25', color: '#7a7060', padding: '.3rem .75rem', borderRadius: '20px', cursor: 'pointer', fontSize: '.67rem', textDecoration: 'none', transition: 'all .15s' }}>← Home</a>
           {!isAdmin ? (
-            <button onClick={() => setLoginOpen(true)} style={{ background: '#221f1a', border: '1px solid #2e2b25', color: '#7a7060', padding: '.3rem .75rem', borderRadius: '20px', cursor: 'pointer', fontSize: '.67rem', fontFamily: 'DM Sans', transition: 'all .15s' }}>⚙ Admin</button>
+            <button onClick={() => setLoginOpen(true)} style={{ background: '#221f1a', border: '1px solid #2e2b25', color: '#7a7060', padding: '.3rem .75rem', borderRadius: '20px', cursor: 'pointer', fontSize: '.67rem', fontFamily: 'DM Sans', transition: 'all .15s' }}>⚙ Admin Login</button>
           ) : (
-            <div style={{ display: 'flex', gap: '.5rem' }}>
-              <span style={{ background: 'rgba(200,169,110,.12)', border: '1px solid rgba(200,169,110,.3)', color: '#c8a96e', padding: '.3rem .75rem', borderRadius: '20px', fontSize: '.67rem' }}>⚙ Admin ✓</span>
-              <button onClick={doLogout} style={{ background: '#221f1a', border: '1px solid #2e2b25', color: '#7a7060', padding: '.3rem .75rem', borderRadius: '20px', cursor: 'pointer', fontSize: '.67rem', fontFamily: 'DM Sans' }}>Keluar</button>
-            </div>
+            <span style={{ background: 'rgba(200,169,110,.12)', border: '1px solid rgba(200,169,110,.3)', color: '#c8a96e', padding: '.3rem .75rem', borderRadius: '20px', fontSize: '.67rem' }}>⚙ Admin ✓</span>
           )}
         </div>
       </header>
@@ -350,7 +347,7 @@ export default function AdminPage() {
           {/* Floor Header */}
           <div style={{ padding: '.8rem 1.5rem', borderBottom: '1px solid #2e2b25', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '.8rem', background: '#1a1814' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '.9rem' }}>
-              <button onClick={() => { setView('calendar'); loadCalData(calYear, calMonth) }} style={{ background: '#221f1a', border: '1px solid #2e2b25', color: '#c8a96e', padding: '.36rem .88rem', borderRadius: '3px', cursor: 'pointer', fontSize: '.8rem', fontFamily: 'DM Sans' }}>← Kalender</button>
+              <button onClick={() => { setView('calendar'); setActiveDate(null); loadCalData(calYear, calMonth) }} style={{ background: '#221f1a', border: '1px solid #2e2b25', color: '#c8a96e', padding: '.36rem .88rem', borderRadius: '3px', cursor: 'pointer', fontSize: '.8rem', fontFamily: 'DM Sans' }}>← Kalender</button>
               <div>
                 <div style={{ fontFamily: "'Playfair Display',serif", fontSize: '1.1rem', color: '#c8a96e' }}>{activeDate && dispDate(activeDate)}</div>
                 <div style={{ fontSize: '.65rem', color: '#7a7060', letterSpacing: '.1em', textTransform: 'uppercase', marginTop: '.1rem' }}>{activeDate && HARI[new Date(activeDate).getDay()]}</div>
