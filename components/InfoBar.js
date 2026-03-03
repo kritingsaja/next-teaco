@@ -8,7 +8,7 @@ export default function InfoBar() {
       <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
         <p className="text-xs text-stone-500 dark:text-stone-400 text-center sm:text-left flex items-center gap-1.5">
           <span>📍</span>
-          Konfirmasi ketersediaan meja & hubungi admin untuk reservasi
+          Konfirmasi lebih lanjut hubungi admin untuk reservasi
         </p>
 
         <div className="flex items-center gap-2 sm:hidden">
