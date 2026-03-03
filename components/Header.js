@@ -22,7 +22,7 @@ export default function Header() {
             </div>
             <div>
               <h1 className="font-display text-lg sm:text-xl text-stone-800 dark:text-cream-100 leading-tight">
-                Reservasi Meja
+                Cek Ketersediaan
               </h1>
               <p className="text-[0.65rem] sm:text-xs text-stone-400 dark:text-stone-500 tracking-widest uppercase">
                 Ramadan 1446 H · Tea Co & Resto
