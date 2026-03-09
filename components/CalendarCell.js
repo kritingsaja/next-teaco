@@ -1,33 +1,43 @@
 import { getOccupancyStatus } from '../lib/supabase'
 
 const levelConfig = {
-  low: {
-    cell: 'bg-white dark:bg-dark-100 hover:bg-cream-50 dark:hover:bg-dark-50',
-    bar: 'bg-gold-400',
-    text: 'text-emerald-600 dark:text-emerald-400',
-    badge: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
-  },
-  med: {
-    cell: 'bg-amber-50/60 dark:bg-amber-900/10',
-    bar: 'bg-amber-400',
-    text: 'text-amber-600 dark:text-amber-400',
-    badge: 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800',
-  },
-  high: {
-    cell: 'bg-red-50/60 dark:bg-red-900/10',
-    bar: 'bg-red-400',
-    text: 'text-red-600 dark:text-red-400',
-    badge: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800',
-  },
-  full: {
-    cell: 'bg-red-100/80 dark:bg-red-900/20',
-    bar: 'bg-red-500',
-    text: 'text-red-700 dark:text-red-300',
-    badge: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700',
-  },
+ low: {
+ cell: 'bg-white dark:bg-dark-100 hover:bg-cream-50 dark:hover:bg-dark-50',
+ bar: 'bg-gold-400',
+ text: 'text-emerald-600 dark:text-emerald-400',
+ badge: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800',
+ },
+ med: {
+ cell: 'bg-amber-50/60 dark:bg-amber-900/10',
+ bar: 'bg-amber-400',
+ text: 'text-amber-600 dark:text-amber-400',
+ badge: 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800',
+ },
+ high: {
+ cell: 'bg-red-50/60 dark:bg-red-900/10',
+ bar: 'bg-red-400',
+ text: 'text-red-600 dark:text-red-400',
+ badge: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800',
+ },
+ full: {
+ cell: 'bg-red-100/80 dark:bg-red-900/20',
+ bar: 'bg-red-500',
+ text: 'text-red-700 dark:text-red-300',
+ badge: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700',
+ },
 }
 
 export default function CalendarCell({ day, dstr, isPast, isToday, data }) {
+  // ===== HOLIDAY CHECK =====
+  // Check if date is holiday (19-22 March 2026)
+  const isHoliday = dstr && [
+    '2026-03-19',
+    '2026-03-20',
+    '2026-03-21',
+    '2026-03-22'
+  ].includes(dstr);
+  // ===== END HOLIDAY CHECK =====
+  
   const { persen, label, level } = getOccupancyStatus(data?.pax || 0)
   const cfg = levelConfig[level]
   const isEmpty = !day
@@ -42,7 +52,45 @@ export default function CalendarCell({ day, dstr, isPast, isToday, data }) {
     )
   }
 
-  return (
+  // ===== HOLIDAY RETURN =====
+  // Return holiday cell
+  if (isHoliday) {
+    return (
+      <div
+        className="
+          border-r border-b border-stone-100 dark:border-dark-50
+          min-h-[90px] sm:min-h-[110px]
+          p-2 sm:p-3
+          bg-gray-100 dark:bg-gray-800
+          cursor-not-allowed
+          relative
+        "
+      >
+        {/* Day number with line-through */}
+        <div className="font-display text-base sm:text-lg leading-none mb-1.5 text-gray-500 dark:text-gray-400 line-through">
+          {day}
+        </div>
+        
+        {/* Holiday badge */}
+        <div className="
+          inline-flex items-center px-1.5 py-0.5 rounded-md
+          text-[0.6rem] sm:text-[0.65rem] font-semibold tracking-wide
+          bg-gray-200 dark:bg-gray-700 
+          text-gray-600 dark:text-gray-300
+          border border-gray-300 dark:border-gray-600
+        ">
+          LIBUR
+        </div>
+        
+        {/* Holiday message */}
+        <div className="text-[0.6rem] mt-1 text-gray-500 dark:text-gray-400 italic">
+          Tidak tersedia
+        </div>
+      </div>
+    );
+  }
+  // ===== END HOLIDAY RETURN =====
+return (
     <div
       className={`
         border-r border-b border-stone-100 dark:border-dark-50
