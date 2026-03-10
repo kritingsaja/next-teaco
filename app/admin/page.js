@@ -50,17 +50,234 @@ const MEJA = [
 ]
 
 const BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember']
-const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']
 const HARI_SHORT = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']
 
 function pad(n) { return String(n).padStart(2, '0') }
 function mkdk(y, m, d) { return `${y}-${pad(m + 1)}-${pad(d)}` }
-function dispDate(s) { const [y, m, d] = s.split('-'); return `${+d} ${BULAN[+m - 1]} ${y}` }
 
+// ================================================================
+//  LOGIN PAGE COMPONENT (full screen, shown before admin content)
+// ================================================================
+function LoginPage({ onLogin }: { onLogin: () => void }) {
+  const [user, setUser] = useState('')
+  const [pass, setPass] = useState('')
+  const [err, setErr] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [showPass, setShowPass] = useState(false)
+  const passRef = useRef<HTMLInputElement>(null)
+
+  const handleSubmit = async () => {
+    setErr('')
+    if (!user.trim() || !pass.trim()) { setErr('Username dan password wajib diisi'); return }
+    setLoading(true)
+    // small delay for UX feel
+    await new Promise(r => setTimeout(r, 500))
+    if (user === ADMIN_USER && pass === ADMIN_PASS) {
+      localStorage.setItem('adm', '1')
+      onLogin()
+    } else {
+      setErr('Username atau password salah')
+      setPass('')
+      passRef.current?.focus()
+    }
+    setLoading(false)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') handleSubmit()
+  }
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: '#0f0e0b',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '1.5rem',
+      fontFamily: "'DM Sans', sans-serif",
+    }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+        * { box-sizing: border-box; }
+        .login-input {
+          width: 100%;
+          background: #1a1814;
+          border: 1px solid #2e2b25;
+          color: #f0ead6;
+          font-family: 'DM Sans', sans-serif;
+          font-size: .9rem;
+          padding: .7rem 1rem;
+          border-radius: 4px;
+          outline: none;
+          transition: border-color .2s, box-shadow .2s;
+        }
+        .login-input:focus {
+          border-color: #c8a96e !important;
+          box-shadow: 0 0 0 3px rgba(200,169,110,0.12);
+        }
+        .login-btn {
+          width: 100%;
+          background: #c8a96e;
+          color: #0f0e0b;
+          border: none;
+          padding: .8rem 1rem;
+          border-radius: 4px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: .88rem;
+          font-weight: 600;
+          letter-spacing: .08em;
+          cursor: pointer;
+          transition: background .2s, transform .1s, opacity .2s;
+          text-transform: uppercase;
+        }
+        .login-btn:hover:not(:disabled) { background: #d4b87a; transform: translateY(-1px); }
+        .login-btn:active:not(:disabled) { transform: translateY(0); }
+        .login-btn:disabled { opacity: .6; cursor: not-allowed; }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(18px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .login-card { animation: fadeUp .45s ease both; }
+        .ornament-line {
+          display: flex; align-items: center; gap: .75rem; margin: 1.4rem 0;
+        }
+        .ornament-line::before, .ornament-line::after {
+          content: ''; flex: 1; height: 1px; background: #2e2b25;
+        }
+      `}</style>
+
+      <div className="login-card" style={{
+        width: '100%',
+        maxWidth: 380,
+        background: '#161410',
+        border: '1px solid #2e2b25',
+        borderRadius: '8px',
+        padding: '2.5rem 2rem',
+        boxShadow: '0 24px 80px rgba(0,0,0,.6)',
+      }}>
+        {/* Logo / Brand */}
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <div style={{
+            width: 52, height: 52,
+            borderRadius: '50%',
+            background: 'rgba(200,169,110,0.1)',
+            border: '1px solid rgba(200,169,110,0.25)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 1rem',
+            fontSize: '1.4rem',
+          }}>☕</div>
+          <h1 style={{
+            fontFamily: "'Playfair Display', serif",
+            fontSize: '1.55rem',
+            color: '#c8a96e',
+            margin: '0 0 .3rem',
+            letterSpacing: '.02em',
+          }}>Tea Co +</h1>
+          <p style={{ fontSize: '.68rem', color: '#7a7060', letterSpacing: '.16em', textTransform: 'uppercase', margin: 0 }}>Admin Panel</p>
+        </div>
+
+        {/* Ornament */}
+        <div className="ornament-line">
+          <span style={{ fontSize: '.6rem', color: '#3a362e', letterSpacing: '.2em', textTransform: 'uppercase' }}>Masuk dengan akun admin</span>
+        </div>
+
+        {/* Form */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '.68rem', color: '#7a7060', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '.4rem' }}>Username</label>
+            <input
+              className="login-input"
+              type="text"
+              value={user}
+              onChange={e => setUser(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="admin"
+              autoComplete="username"
+              autoFocus
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '.68rem', color: '#7a7060', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '.4rem' }}>Password</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                ref={passRef}
+                className="login-input"
+                type={showPass ? 'text' : 'password'}
+                value={pass}
+                onChange={e => setPass(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="••••••••"
+                autoComplete="current-password"
+                style={{ paddingRight: '2.8rem' }}
+              />
+              <button
+                onClick={() => setShowPass(v => !v)}
+                style={{
+                  position: 'absolute', right: '.75rem', top: '50%', transform: 'translateY(-50%)',
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  color: '#7a7060', fontSize: '.85rem', padding: '.2rem',
+                  lineHeight: 1,
+                }}
+                tabIndex={-1}
+                type="button"
+              >{showPass ? '🙈' : '👁'}</button>
+            </div>
+          </div>
+
+          {/* Error */}
+          {err && (
+            <div style={{
+              background: 'rgba(139,58,58,0.2)', border: '1px solid rgba(139,58,58,0.4)',
+              color: '#e07070', fontSize: '.78rem', padding: '.55rem .75rem', borderRadius: '4px',
+              display: 'flex', alignItems: 'center', gap: '.5rem',
+            }}>
+              <span>⚠</span> {err}
+            </div>
+          )}
+
+          <button
+            className="login-btn"
+            onClick={handleSubmit}
+            disabled={loading}
+            style={{ marginTop: '.3rem' }}
+          >
+            {loading
+              ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem' }}>
+                  <span style={{ display: 'inline-block', width: 14, height: 14, border: '2px solid rgba(0,0,0,.3)', borderTopColor: '#0f0e0b', borderRadius: '50%', animation: 'spin .6s linear infinite' }} />
+                  Memeriksa...
+                </span>
+              : 'Masuk'}
+          </button>
+        </div>
+
+        {/* Back to home */}
+        <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+          <a href="/" style={{ fontSize: '.72rem', color: '#7a7060', textDecoration: 'none', letterSpacing: '.06em', transition: 'color .15s' }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#c8a96e')}
+            onMouseLeave={e => (e.currentTarget.style.color = '#7a7060')}
+          >← Kembali ke halaman utama</a>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ================================================================
+//  MAIN ADMIN PAGE
+// ================================================================
 export default function AdminPage() {
   const today = new Date()
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [view, setView] = useState('calendar') // 'calendar' | 'floor'
+
+  // ── Auth state ─────────────────────────────────────────────────
+  // null  = belum dicek (hydrating)
+  // false = belum login
+  // true  = sudah login
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
+
+  const [view, setView] = useState('calendar')
   const [calYear, setCalYear] = useState(today.getFullYear())
   const [calMonth, setCalMonth] = useState(today.getMonth())
   const [calData, setCalData] = useState({})
@@ -70,12 +287,6 @@ export default function AdminPage() {
   const [totalPax, setTotalPax] = useState(0)
   const [dbStatus, setDbStatus] = useState('loading')
   const [dbLabel, setDbLabel] = useState('Menghubungkan...')
-
-  // Login modal
-  const [loginOpen, setLoginOpen] = useState(false)
-  const [loginUser, setLoginUser] = useState('')
-  const [loginPass, setLoginPass] = useState('')
-  const [loginErr, setLoginErr] = useState('')
 
   // Reservation modal
   const [modalOpen, setModalOpen] = useState(false)
@@ -101,12 +312,15 @@ export default function AdminPage() {
     toastTimer.current = setTimeout(() => setToast(t => ({ ...t, show: false })), 3200)
   }, [])
 
-  // Check session
+  // ── Check session on mount ─────────────────────────────────────
   useEffect(() => {
-    if (typeof window !== 'undefined' && localStorage.getItem('adm') === '1') setIsAdmin(true)
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('adm') === '1'
+      setIsAdmin(saved)
+    }
   }, [])
 
-  // Check DB
+  // ── Check DB ───────────────────────────────────────────────────
   useEffect(() => {
     (async () => {
       try {
@@ -119,7 +333,7 @@ export default function AdminPage() {
     })()
   }, [])
 
-  // Load calendar data
+  // ── Load calendar data ─────────────────────────────────────────
   const loadCalData = useCallback(async (y, m) => {
     setCalLoading(true)
     const s = `${y}-${pad(m + 1)}-01`
@@ -137,21 +351,7 @@ export default function AdminPage() {
     finally { setCalLoading(false) }
   }, [])
 
-  useEffect(() => { loadCalData(calYear, calMonth) }, [calYear, calMonth, loadCalData])
-
-  const submitLogin = () => {
-    if (!loginUser || !loginPass) { setLoginErr('Isi username dan password!'); return }
-    if (loginUser === ADMIN_USER && loginPass === ADMIN_PASS) {
-      setIsAdmin(true)
-      localStorage.setItem('adm', '1')
-      setLoginOpen(false)
-      setLoginUser(''); setLoginPass(''); setLoginErr('')
-      showToast('✅ Login admin berhasil!')
-    } else {
-      setLoginErr('❌ Username atau password salah')
-      setLoginPass('')
-    }
-  }
+  useEffect(() => { if (isAdmin) loadCalData(calYear, calMonth) }, [calYear, calMonth, loadCalData, isAdmin])
 
   const doLogout = () => {
     setIsAdmin(false)
@@ -165,7 +365,6 @@ export default function AdminPage() {
       const map = {}
       rows.forEach(r => { map[r.meja_id] = r })
       const pax = rows.reduce((s, r) => s + (r.jumlah_tamu || 0), 0)
-      if (!isAdmin && pax >= MAX_KAPASITAS) { showToast(`🔴 Tanggal ini sudah penuh! (${pax}/${MAX_KAPASITAS} orang)`, 'err'); return }
       setResData(map)
       setTotalPax(pax)
       setActiveDate(ds)
@@ -174,7 +373,6 @@ export default function AdminPage() {
   }
 
   const openModal = (id) => {
-    if (!isAdmin) return
     const r = resData[id] || {}
     setModalMejaId(id)
     setMGuest(r.nama_tamu || '')
@@ -241,6 +439,15 @@ export default function AdminPage() {
   const occCount = MEJA.filter(m => !!resData[m.id]).length
   const sisaKap = MAX_KAPASITAS - totalPax
 
+  // ── HYDRATING — don't render anything yet ─────────────────────
+  if (isAdmin === null) return null
+
+  // ── NOT LOGGED IN — show full-screen login page ───────────────
+  if (!isAdmin) {
+    return <LoginPage onLogin={() => { setIsAdmin(true); loadCalData(calYear, calMonth) }} />
+  }
+
+  // ── LOGGED IN — show admin panel ──────────────────────────────
   return (
     <div className="min-h-screen" style={{ background: '#0f0e0b', color: '#f0ead6', fontFamily: "'DM Sans', sans-serif" }}>
       <style>{`
@@ -252,7 +459,6 @@ export default function AdminPage() {
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes blink { 0%,100%{opacity:1;}50%{opacity:.3;} }
         .db-blink { animation: blink 1s infinite; }
-        .table-hover:hover .tbody-rect { filter: brightness(1.3); }
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: rgba(200,169,110,.2); border-radius: 3px; }
       `}</style>
@@ -269,29 +475,24 @@ export default function AdminPage() {
             <div style={{ width: 7, height: 7, borderRadius: '50%', background: dbStatus === 'ok' ? '#5cb85c' : dbStatus === 'err' ? '#8b3a3a' : '#c8a96e', boxShadow: dbStatus === 'ok' ? '0 0 6px rgba(92,184,92,.5)' : 'none' }} className={dbStatus === 'loading' ? 'db-blink' : ''} />
             {dbLabel}
           </div>
-          <a href="/" style={{ background: '#221f1a', border: '1px solid #2e2b25', color: '#7a7060', padding: '.3rem .75rem', borderRadius: '20px', cursor: 'pointer', fontSize: '.67rem', textDecoration: 'none', transition: 'all .15s' }}>← Home</a>
-          {!isAdmin ? (
-            <button onClick={() => setLoginOpen(true)} style={{ background: '#221f1a', border: '1px solid #2e2b25', color: '#7a7060', padding: '.3rem .75rem', borderRadius: '20px', cursor: 'pointer', fontSize: '.67rem', fontFamily: 'DM Sans', transition: 'all .15s' }}>⚙ Admin Login</button>
-          ) : (
-            <span style={{ background: 'rgba(200,169,110,.12)', border: '1px solid rgba(200,169,110,.3)', color: '#c8a96e', padding: '.3rem .75rem', borderRadius: '20px', fontSize: '.67rem' }}>⚙ Admin ✓</span>
-          )}
+          <a href="/" style={{ background: '#221f1a', border: '1px solid #2e2b25', color: '#7a7060', padding: '.3rem .75rem', borderRadius: '20px', cursor: 'pointer', fontSize: '.67rem', textDecoration: 'none' }}>← Home</a>
+          <span style={{ background: 'rgba(200,169,110,.12)', border: '1px solid rgba(200,169,110,.3)', color: '#c8a96e', padding: '.3rem .75rem', borderRadius: '20px', fontSize: '.67rem' }}>⚙ Admin ✓</span>
+          <button onClick={doLogout} style={{ background: '#221f1a', border: '1px solid #2e2b25', color: '#7a7060', padding: '.3rem .75rem', borderRadius: '20px', cursor: 'pointer', fontSize: '.67rem', fontFamily: 'DM Sans' }}>Keluar</button>
         </div>
       </header>
 
       {/* ============ CALENDAR VIEW ============ */}
       {view === 'calendar' && (
         <div style={{ maxWidth: 840, margin: '2rem auto', padding: '0 1.2rem' }}>
-          {/* Cal Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
             <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: '1.4rem', color: '#c8a96e', margin: 0 }}>{BULAN[calMonth]} {calYear}</h2>
             <div style={{ display: 'flex', gap: '.4rem' }}>
               {[['‹', () => { if (calMonth === 0) { setCalYear(y => y - 1); setCalMonth(11) } else setCalMonth(m => m - 1) }], ['Hari Ini', () => { setCalYear(today.getFullYear()); setCalMonth(today.getMonth()) }], ['›', () => { if (calMonth === 11) { setCalYear(y => y + 1); setCalMonth(0) } else setCalMonth(m => m + 1) }]].map(([label, fn]) => (
-                <button key={label} onClick={fn} style={{ background: '#221f1a', border: '1px solid #2e2b25', color: '#f0ead6', padding: '.4rem .85rem', borderRadius: '3px', cursor: 'pointer', fontSize: '.85rem', fontFamily: 'DM Sans', transition: 'border-color .15s' }}>{label}</button>
+                <button key={label} onClick={fn} style={{ background: '#221f1a', border: '1px solid #2e2b25', color: '#f0ead6', padding: '.4rem .85rem', borderRadius: '3px', cursor: 'pointer', fontSize: '.85rem', fontFamily: 'DM Sans' }}>{label}</button>
               ))}
             </div>
           </div>
 
-          {/* Grid */}
           <div style={{ background: '#1a1814', border: '1px solid #2e2b25', borderRadius: '6px', overflow: 'hidden' }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', borderBottom: '1px solid #2e2b25' }}>
               {HARI_SHORT.map(h => <div key={h} style={{ textAlign: 'center', padding: '.55rem', fontSize: '.64rem', letterSpacing: '.12em', textTransform: 'uppercase', color: '#7a7060' }}>{h}</div>)}
@@ -306,7 +507,7 @@ export default function AdminPage() {
                 const isAlmost = data.pax >= MAX_KAPASITAS * 0.8 && !isFull
                 const isToday = dstr === todayStr
                 let bg = 'transparent'
-                if (isFull) bg = isAdmin ? 'rgba(200,150,50,0.15)' : 'rgba(139,58,58,0.25)'
+                if (isFull) bg = 'rgba(200,150,50,0.15)'
                 else if (isAlmost) bg = 'rgba(200,150,50,0.1)'
                 else if (data.count) bg = 'rgba(139,58,58,0.07)'
                 return (
@@ -314,14 +515,14 @@ export default function AdminPage() {
                     onClick={() => !isPast && goFloor(dstr)}
                     className={!isPast ? 'cal-cell-hover' : ''}
                     style={{ borderRight: i % 7 !== 6 ? '1px solid #2e2b25' : 'none', borderBottom: '1px solid #2e2b25', minHeight: 90, padding: '.45rem .55rem', cursor: isPast ? 'default' : 'pointer', opacity: isPast ? .35 : 1, background: bg, transition: 'background .15s', outline: isToday ? '2px solid #c8a96e' : 'none', outlineOffset: -2 }}>
-                    <div style={{ fontFamily: "'Playfair Display',serif", fontSize: '.88rem', color: isFull ? (isAdmin ? '#d4a84a' : '#e07070') : isAlmost ? '#d4a84a' : isToday ? '#c8a96e' : '#f0ead6', fontWeight: isToday ? 700 : 400 }}>{day}</div>
+                    <div style={{ fontFamily: "'Playfair Display',serif", fontSize: '.88rem', color: isFull ? '#d4a84a' : isToday ? '#c8a96e' : '#f0ead6', fontWeight: isToday ? 700 : 400 }}>{day}</div>
                     {data.count > 0 && (
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, marginTop: '.3rem' }}>
                         {Array.from({ length: Math.min(data.count, 9) }).map((_, j) => <div key={j} style={{ width: 6, height: 6, borderRadius: '50%', background: isFull ? '#e07070' : '#8b3a3a', opacity: .85 }} />)}
                       </div>
                     )}
                     <div style={{ fontSize: '.6rem', color: isFull ? '#e07070' : isAlmost ? '#d4a84a' : '#7a7060', marginTop: '.25rem', lineHeight: 1.3, fontWeight: isFull ? 600 : 400 }}>
-                      {isFull ? `${isAdmin ? '⚠️' : '🔴'} PENUH\n${data.pax}/${MAX_KAPASITAS} org` : isAlmost ? `⚠️ ${data.pax}/${MAX_KAPASITAS}\nHampir penuh` : data.count ? `${data.count} reservasi\n${data.pax} orang` : ''}
+                      {isFull ? `⚠️ PENUH\n${data.pax}/${MAX_KAPASITAS} org` : isAlmost ? `⚠️ ${data.pax}/${MAX_KAPASITAS}\nHampir penuh` : data.count ? `${data.count} reservasi\n${data.pax} orang` : ''}
                     </div>
                   </div>
                 )
@@ -329,121 +530,91 @@ export default function AdminPage() {
             </div>
           </div>
           <p style={{ textAlign: 'center', fontSize: '.7rem', color: '#7a7060', marginTop: '1rem', letterSpacing: '.08em' }}>
-            {isAdmin ? 'Admin: Bisa klik tanggal penuh untuk override' : 'Klik tanggal untuk melihat denah meja'}
+            Admin: Bisa klik tanggal penuh untuk override
           </p>
         </div>
       )}
 
       {/* ============ FLOOR VIEW ============ */}
-      {view === 'floor' && (
-        <div>
-          {/* Banner */}
-          {(isAdmin || sisaKap <= 0 || sisaKap < 10) && (
-            <div style={{ padding: '.45rem 1.5rem', fontSize: '.72rem', display: 'flex', alignItems: 'center', gap: '.5rem', background: totalPax > MAX_KAPASITAS ? 'rgba(200,169,110,.15)' : sisaKap <= 0 ? 'rgba(139,58,58,.2)' : 'rgba(200,169,110,.1)', borderBottom: '1px solid rgba(200,169,110,.2)', color: totalPax > MAX_KAPASITAS ? '#c8a96e' : sisaKap <= 0 ? '#e07070' : '#c8a96e' }}>
-              {isAdmin ? (totalPax > MAX_KAPASITAS ? `⚠️ OVERRIDE AKTIF — Sudah ${totalPax}/${MAX_KAPASITAS} orang` : `✏️ Mode Edit Aktif — klik meja untuk ubah reservasi`) : (sisaKap <= 0 ? '🔴 SUDAH PENUH! Hubungi admin untuk waiting list' : `⚠️ Sisa ${sisaKap} orang lagi sampai penuh!`)}
-            </div>
-          )}
-
-          {/* Floor Header */}
-          <div style={{ padding: '.8rem 1.5rem', borderBottom: '1px solid #2e2b25', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '.8rem', background: '#1a1814' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '.9rem' }}>
-              <button onClick={() => { setView('calendar'); setActiveDate(null); loadCalData(calYear, calMonth) }} style={{ background: '#221f1a', border: '1px solid #2e2b25', color: '#c8a96e', padding: '.36rem .88rem', borderRadius: '3px', cursor: 'pointer', fontSize: '.8rem', fontFamily: 'DM Sans' }}>← Kalender</button>
-              <div>
-                <div style={{ fontFamily: "'Playfair Display',serif", fontSize: '1.1rem', color: '#c8a96e' }}>{activeDate && dispDate(activeDate)}</div>
-                <div style={{ fontSize: '.65rem', color: '#7a7060', letterSpacing: '.1em', textTransform: 'uppercase', marginTop: '.1rem' }}>{activeDate && HARI[new Date(activeDate).getDay()]}</div>
-              </div>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '.9rem', flexWrap: 'wrap' }}>
-              <div style={{ display: 'flex', gap: '.9rem' }}>
-                {[['#c8a96e', 'Tersedia'], ['#8b3a3a', 'Terisi']].map(([c, l]) => <div key={l} style={{ display: 'flex', alignItems: 'center', gap: '.38rem', fontSize: '.72rem', color: '#7a7060' }}><div style={{ width: 9, height: 9, borderRadius: 2, background: c }} />{l}</div>)}
-              </div>
+      {view === 'floor' && activeDate && (
+        <div style={{ maxWidth: 840, margin: '2rem auto', padding: '0 1.2rem' }}>
+          {/* Back button */}
+          <div style={{ marginBottom: '1.2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <button onClick={() => { setView('calendar'); setActiveDate(null) }} style={{ background: '#221f1a', border: '1px solid #2e2b25', color: '#c8a96e', padding: '.4rem .85rem', borderRadius: '3px', cursor: 'pointer', fontSize: '.82rem', fontFamily: 'DM Sans' }}>← Kembali</button>
+            <div>
+              <span style={{ fontFamily: "'Playfair Display',serif", fontSize: '1.1rem', color: '#c8a96e' }}>
+                {activeDate.split('-').reverse().map((v, i) => i === 1 ? BULAN[+v - 1] : v).join(' ')}
+              </span>
+              <span style={{ fontSize: '.7rem', color: '#7a7060', marginLeft: '.75rem' }}>
+                {occCount}/{MEJA.length} meja · {totalPax}/{MAX_KAPASITAS} orang {sisaKap < 0 ? `(+${Math.abs(sisaKap)} override)` : `(sisa ${sisaKap})`}
+              </span>
             </div>
           </div>
 
-          {/* Stats */}
-          <div style={{ display: 'flex', gap: '1.5rem', padding: '.7rem 1.5rem', borderBottom: '1px solid #2e2b25', flexWrap: 'wrap', alignItems: 'center' }}>
-            {[
-              [MEJA.length, 'Total Meja'],
-              [MEJA.length - occCount, 'Tersedia', sisaKap < 10 ? '#e07070' : '#c8a96e'],
-              [occCount, 'Terisi', '#e07070'],
-              [`${totalPax}/${MAX_KAPASITAS}`, 'Kapasitas', totalPax >= MAX_KAPASITAS ? '#e07070' : '#c8a96e'],
-            ].map(([val, lbl, clr], i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                {i > 0 && <div style={{ width: 1, height: 28, background: '#2e2b25' }} />}
-                <div>
-                  <div style={{ fontSize: '1.4rem', fontFamily: "'Playfair Display',serif", color: clr || '#c8a96e', lineHeight: 1 }}>{val}</div>
-                  <div style={{ fontSize: '.62rem', color: '#7a7060', letterSpacing: '.12em', textTransform: 'uppercase', marginTop: '.1rem' }}>{lbl}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <main style={{ padding: '1.2rem 1.5rem' }}>
-            {/* Floor Plan */}
-            <div style={{ fontSize: '.62rem', letterSpacing: '.18em', textTransform: 'uppercase', color: '#7a7060', marginBottom: '.8rem', display: 'flex', alignItems: 'center', gap: '.6rem' }}>
-              Denah Lantai <div style={{ flex: 1, height: 1, background: '#2e2b25' }} />
-            </div>
-            <div style={{ background: '#1a1814', border: '1px solid #2e2b25', borderRadius: 4, padding: '.8rem', overflowX: 'auto' }}>
-              <FloorSVG meja={MEJA} resData={resData} isAdmin={isAdmin} onMejaClick={openModal} />
-            </div>
-
-            {/* Table List */}
-            <div style={{ fontSize: '.62rem', letterSpacing: '.18em', textTransform: 'uppercase', color: '#7a7060', margin: '1.2rem 0 .8rem', display: 'flex', alignItems: 'center', gap: '.6rem' }}>
-              Daftar Meja <div style={{ flex: 1, height: 1, background: '#2e2b25' }} />
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(180px,1fr))', gap: '.55rem' }}>
+          {/* Floor map - simple table grid */}
+          <div style={{ background: '#1a1814', border: '1px solid #2e2b25', borderRadius: '6px', padding: '1rem', overflowX: 'auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '.6rem' }}>
               {MEJA.map(m => {
-                const r = resData[m.id], occ = !!r
+                const booked = !!resData[m.id]
                 return (
-                  <div key={m.id} onClick={() => isAdmin && openModal(m.id)}
-                    style={{ background: '#221f1a', border: '1px solid #2e2b25', borderLeft: `3px solid ${occ ? '#8b3a3a' : '#c8a96e'}`, borderRadius: 3, padding: '.72rem .88rem', cursor: isAdmin ? 'pointer' : 'default', transition: 'border-color .15s' }}>
-                    <div style={{ fontFamily: "'Playfair Display',serif", fontSize: '.86rem', marginBottom: '.1rem' }}>{m.nama}</div>
-                    <div style={{ fontSize: '.66rem', color: '#7a7060' }}>{m.kursi} kursi · {m.area}</div>
-                    {r && <div style={{ fontSize: '.72rem', marginTop: '.26rem' }}>👤 {r.nama_tamu}{r.jumlah_tamu ? ` (${r.jumlah_tamu} org)` : ''}</div>}
-                    {r?.jam && <div style={{ fontSize: '.64rem', color: '#7a7060', marginTop: '.04rem' }}>🕐 {r.jam.slice(0, 5)}{r.catatan ? ` · ${r.catatan}` : ''}</div>}
-                    <div style={{ display: 'inline-block', marginTop: '.3rem', fontSize: '.59rem', letterSpacing: '.1em', textTransform: 'uppercase', padding: '.12rem .36rem', borderRadius: 2, background: occ ? 'rgba(139,58,58,.2)' : 'rgba(200,169,110,.13)', color: occ ? '#e07070' : '#c8a96e' }}>{occ ? 'Terisi' : 'Tersedia'}</div>
+                  <div
+                    key={m.id}
+                    onClick={() => openModal(m.id)}
+                    style={{
+                      background: booked ? 'rgba(139,58,58,0.3)' : 'rgba(200,169,110,0.06)',
+                      border: `1px solid ${booked ? 'rgba(139,58,58,0.6)' : '#2e2b25'}`,
+                      borderRadius: '4px',
+                      padding: '.65rem .75rem',
+                      cursor: 'pointer',
+                      transition: 'all .15s',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#c8a96e'; e.currentTarget.style.background = booked ? 'rgba(139,58,58,0.4)' : 'rgba(200,169,110,0.12)' }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = booked ? 'rgba(139,58,58,0.6)' : '#2e2b25'; e.currentTarget.style.background = booked ? 'rgba(139,58,58,0.3)' : 'rgba(200,169,110,0.06)' }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <span style={{ fontSize: '.72rem', color: '#c8a96e', fontWeight: 600 }}>{m.nama}</span>
+                      <span style={{ fontSize: '.6rem', color: '#7a7060' }}>{m.kursi} kursi</span>
+                    </div>
+                    <div style={{ fontSize: '.62rem', color: '#7a7060', marginTop: '.2rem' }}>{m.area}</div>
+                    {booked && resData[m.id] && (
+                      <div style={{ marginTop: '.4rem', paddingTop: '.4rem', borderTop: '1px solid rgba(139,58,58,0.4)' }}>
+                        <div style={{ fontSize: '.72rem', color: '#f0ead6', fontWeight: 500 }}>{resData[m.id].nama_tamu}</div>
+                        {resData[m.id].jam && <div style={{ fontSize: '.62rem', color: '#c8a96e' }}>{resData[m.id].jam.slice(0, 5)}</div>}
+                        {resData[m.id].jumlah_tamu && <div style={{ fontSize: '.62rem', color: '#7a7060' }}>{resData[m.id].jumlah_tamu} orang</div>}
+                      </div>
+                    )}
+                    {!booked && <div style={{ fontSize: '.66rem', color: '#3a362e', marginTop: '.35rem' }}>Kosong — klik untuk isi</div>}
                   </div>
                 )
               })}
             </div>
-          </main>
-        </div>
-      )}
-
-      {/* ============ LOGIN MODAL ============ */}
-      {loginOpen && (
-        <div onClick={() => setLoginOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.85)', zIndex: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#1a1814', border: '1px solid #2e2b25', borderRadius: 10, padding: '2.2rem 2rem', width: '90%', maxWidth: 320, textAlign: 'center' }}>
-            <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: '1.35rem', color: '#c8a96e', marginBottom: '.25rem' }}>Login Admin</h2>
-            <p style={{ fontSize: '.65rem', color: '#7a7060', letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: '1.6rem' }}>Masukkan kredensial admin</p>
-            {[['Username', loginUser, setLoginUser, 'text', false], ['Password', loginPass, setLoginPass, 'password', true]].map(([lbl, val, set, type, isLast]) => (
-              <div key={lbl} style={{ textAlign: 'left', marginBottom: '.85rem' }}>
-                <label style={{ display: 'block', fontSize: '.62rem', letterSpacing: '.1em', textTransform: 'uppercase', color: '#7a7060', marginBottom: '.28rem' }}>{lbl}</label>
-                <input type={type} value={val} onChange={e => set(e.target.value)} onKeyDown={e => isLast && e.key === 'Enter' && submitLogin()} placeholder={`${lbl}...`} autoComplete="off" />
-              </div>
-            ))}
-            <button onClick={submitLogin} style={{ width: '100%', background: '#c8a96e', color: '#0f0e0b', border: 'none', padding: '.65rem', borderRadius: 4, cursor: 'pointer', fontFamily: 'DM Sans', fontSize: '.88rem', fontWeight: 700 }}>Masuk sebagai Admin</button>
-            {loginErr && <div style={{ color: '#e07070', fontSize: '.75rem', marginTop: '.7rem' }}>{loginErr}</div>}
-            <span onClick={() => setLoginOpen(false)} style={{ display: 'block', marginTop: '1rem', fontSize: '.7rem', color: '#7a7060', cursor: 'pointer', textDecoration: 'underline' }}>Batal</span>
           </div>
         </div>
       )}
 
       {/* ============ RESERVATION MODAL ============ */}
-      {modalOpen && activeMeja && (
-        <div onClick={() => setModalOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.82)', zIndex: 600, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: '#221f1a', border: '1px solid #2e2b25', borderRadius: 6, padding: '1.8rem', width: '90%', maxWidth: 390 }}>
-            <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: '1.1rem', color: '#c8a96e', marginBottom: '1.2rem' }}>{activeMeja.nama} · {activeMeja.kursi} kursi · {activeMeja.area}</h2>
-            {[['Nama Tamu', mGuest, setMGuest, 'text', 'Nama pemesan...'], ['Jam Reservasi', mTime, setMTime, 'time', ''], ['Jumlah Tamu', mPax, setMPax, 'number', 'Jumlah orang'], ['Catatan', mNote, setMNote, 'text', 'Catatan khusus (opsional)']].map(([lbl, val, set, type, ph]) => (
-              <div key={lbl}>
-                <label style={{ display: 'block', fontSize: '.65rem', letterSpacing: '.1em', textTransform: 'uppercase', color: '#7a7060', marginBottom: '.26rem' }}>{lbl}</label>
-                <input type={type} value={val} onChange={e => set(e.target.value)} placeholder={ph} min={type === 'number' ? 1 : undefined} max={type === 'number' ? 30 : undefined} />
+      {modalOpen && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.75)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={e => e.target === e.currentTarget && setModalOpen(false)}>
+          <div style={{ background: '#161410', border: '1px solid #2e2b25', borderRadius: '8px', padding: '1.5rem', width: '100%', maxWidth: 380, maxHeight: '90vh', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+              <h3 style={{ fontFamily: "'Playfair Display',serif", color: '#c8a96e', margin: 0, fontSize: '1.1rem' }}>
+                {activeMeja?.nama} <span style={{ fontSize: '.72rem', color: '#7a7060', fontFamily: 'DM Sans' }}>· {activeMeja?.area}</span>
+              </h3>
+              <button onClick={() => setModalOpen(false)} style={{ background: 'none', border: 'none', color: '#7a7060', cursor: 'pointer', fontSize: '1.2rem', padding: '.2rem' }}>✕</button>
+            </div>
+            {[['Nama Tamu *', mGuest, setMGuest, 'text', 'Nama tamu'], ['Jam', mTime, setMTime, 'time', ''], ['Jumlah Orang', mPax, setMPax, 'number', ''], ['Catatan', mNote, setMNote, 'text', '']].map(([label, val, setter, type, ph]) => (
+              <div key={label}>
+                <label style={{ display: 'block', fontSize: '.65rem', color: '#7a7060', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: '.3rem' }}>{label}</label>
+                <input type={type} value={val} onChange={e => setter(e.target.value)} placeholder={ph} />
               </div>
             ))}
-            <div style={{ display: 'flex', gap: '.55rem', marginTop: '.2rem' }}>
-              <button onClick={handleSave} disabled={mSaving} style={{ flex: 1, padding: '.56rem', border: 'none', borderRadius: 3, cursor: 'pointer', fontFamily: 'DM Sans', fontSize: '.78rem', background: '#c8a96e', color: '#0f0e0b', fontWeight: 600, opacity: mSaving ? .6 : 1 }}>{mSaving ? 'Menyimpan...' : 'Simpan'}</button>
-              <button onClick={doClear} disabled={mSaving} style={{ flex: 1, padding: '.56rem', border: 'none', borderRadius: 3, cursor: 'pointer', fontFamily: 'DM Sans', fontSize: '.78rem', background: '#8b3a3a', color: '#f0ead6', opacity: mSaving ? .6 : 1 }}>{mSaving ? 'Menghapus...' : 'Kosongkan'}</button>
-              <button onClick={() => setModalOpen(false)} style={{ flex: '0 0 auto', padding: '.56rem .85rem', border: '1px solid #2e2b25', borderRadius: 3, cursor: 'pointer', fontFamily: 'DM Sans', fontSize: '.78rem', background: '#1a1814', color: '#7a7060' }}>Batal</button>
+            <div style={{ display: 'flex', gap: '.5rem', marginTop: '.5rem' }}>
+              <button onClick={handleSave} disabled={mSaving} style={{ flex: 1, background: '#c8a96e', color: '#0f0e0b', border: 'none', padding: '.65rem', borderRadius: '4px', cursor: mSaving ? 'not-allowed' : 'pointer', fontFamily: 'DM Sans', fontWeight: 600, fontSize: '.82rem', opacity: mSaving ? .6 : 1 }}>
+                {mSaving ? '...' : 'Simpan'}
+              </button>
+              {resData[modalMejaId] && (
+                <button onClick={doClear} disabled={mSaving} style={{ background: 'rgba(139,58,58,0.3)', color: '#e07070', border: '1px solid rgba(139,58,58,0.5)', padding: '.65rem .9rem', borderRadius: '4px', cursor: 'pointer', fontFamily: 'DM Sans', fontSize: '.82rem' }}>Kosongkan</button>
+              )}
             </div>
           </div>
         </div>
@@ -451,82 +622,24 @@ export default function AdminPage() {
 
       {/* ============ OVERRIDE MODAL ============ */}
       {overrideOpen && (
-        <div onClick={() => { setOverrideOpen(false); setPendingOverride(null) }} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.82)', zIndex: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: 'rgba(139,58,58,.15)', border: '2px solid #d4a84a', borderRadius: 6, padding: '1.8rem', width: '90%', maxWidth: 390 }}>
-            <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: '1.1rem', color: '#d4a84a', marginBottom: '1rem' }}>⚠️ Override Kapasitas</h2>
-            <p style={{ fontSize: '.75rem', color: '#f0ead6', marginBottom: '1.2rem', lineHeight: 1.5 }} dangerouslySetInnerHTML={{ __html: overrideMsg }} />
-            <div style={{ display: 'flex', gap: '.55rem' }}>
-              <button onClick={async () => { setOverrideOpen(false); if (pendingOverride) { await doSave(pendingOverride.guest, pendingOverride.time, pendingOverride.pax, pendingOverride.note); setPendingOverride(null) } }} style={{ flex: 1, padding: '.56rem', border: 'none', borderRadius: 3, cursor: 'pointer', fontFamily: 'DM Sans', fontSize: '.78rem', background: '#c8a96e', color: '#0f0e0b', fontWeight: 600 }}>Ya, Lanjutkan</button>
-              <button onClick={() => { setOverrideOpen(false); setPendingOverride(null) }} style={{ flex: '0 0 auto', padding: '.56rem .85rem', border: '1px solid #2e2b25', borderRadius: 3, cursor: 'pointer', fontFamily: 'DM Sans', fontSize: '.78rem', background: '#1a1814', color: '#7a7060' }}>Batal</button>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.8)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ background: '#161410', border: '1px solid rgba(200,169,110,.3)', borderRadius: '8px', padding: '1.5rem', width: '100%', maxWidth: 360 }}>
+            <h3 style={{ color: '#d4a84a', fontFamily: "'Playfair Display',serif", marginTop: 0 }}>⚠ Override Kapasitas</h3>
+            <p style={{ fontSize: '.82rem', color: '#b0a080', lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: overrideMsg }} />
+            <div style={{ display: 'flex', gap: '.5rem', marginTop: '1rem' }}>
+              <button onClick={async () => { setOverrideOpen(false); await doSave(pendingOverride.guest, pendingOverride.time, pendingOverride.pax, pendingOverride.note) }} style={{ flex: 1, background: 'rgba(200,169,110,.15)', color: '#c8a96e', border: '1px solid rgba(200,169,110,.3)', padding: '.6rem', borderRadius: '4px', cursor: 'pointer', fontFamily: 'DM Sans', fontSize: '.82rem' }}>Ya, Lanjutkan</button>
+              <button onClick={() => { setOverrideOpen(false); setPendingOverride(null) }} style={{ flex: 1, background: '#221f1a', color: '#7a7060', border: '1px solid #2e2b25', padding: '.6rem', borderRadius: '4px', cursor: 'pointer', fontFamily: 'DM Sans', fontSize: '.82rem' }}>Batal</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* TOAST */}
-      <div style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem', background: '#221f1a', border: `1px solid #2e2b25`, borderLeft: `3px solid ${toast.type === 'err' ? '#8b3a3a' : '#c8a96e'}`, padding: '.62rem 1.1rem', borderRadius: 4, fontSize: '.78rem', color: '#f0ead6', zIndex: 700, maxWidth: 300, transition: 'all .25s', transform: toast.show ? 'translateY(0)' : 'translateY(10px)', opacity: toast.show ? 1 : 0, pointerEvents: 'none' }}>
-        {toast.msg}
-      </div>
+      {/* ============ TOAST ============ */}
+      {toast.show && (
+        <div style={{ position: 'fixed', bottom: '1.5rem', left: '50%', transform: 'translateX(-50%)', background: toast.type === 'err' ? '#3a1a1a' : '#1e1c17', border: `1px solid ${toast.type === 'err' ? '#8b3a3a' : '#2e2b25'}`, color: toast.type === 'err' ? '#e07070' : '#c8a96e', padding: '.6rem 1.2rem', borderRadius: '20px', fontSize: '.78rem', zIndex: 999, whiteSpace: 'nowrap', boxShadow: '0 8px 24px rgba(0,0,0,.5)' }}>
+          {toast.msg}
+        </div>
+      )}
     </div>
   )
-}
-
-// ============ FLOOR SVG COMPONENT ============
-function FloorSVG({ meja, resData, isAdmin, onMejaClick }) {
-  return (
-    <svg viewBox="0 0 460 1000" width="460" height="1000" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block', margin: '0 auto', maxWidth: '100%', height: 'auto' }}>
-      {/* Areas */}
-      <rect x="158" y="4" width="296" height="460" fill="none" stroke="#6a6050" strokeWidth="4" />
-      <rect x="158" y="2" width="90" height="8" rx="1" fill="#c8a96e" opacity=".8" />
-      <text x="203" y="1" fontFamily="DM Sans,sans-serif" fontSize="7" fill="#c8a96e" textAnchor="middle" letterSpacing="1">PINTU MASUK</text>
-      <text x="370" y="280" fontFamily="DM Sans,sans-serif" fontSize="9" fill="#6a6050" textAnchor="middle" letterSpacing="2">INDOOR</text>
-      <rect x="4" y="76" width="158" height="388" fill="rgba(60,110,160,0.06)" stroke="#5a8aaa" strokeWidth="4" />
-      <text x="83" y="450" fontFamily="DM Sans,sans-serif" fontSize="8" fill="#5a9aba" textAnchor="middle" letterSpacing="1">MEETING ROOM</text>
-      <rect x="158" y="390" width="296" height="74" fill="rgba(80,80,60,0.05)" stroke="#6a6050" strokeWidth="2" />
-      <text x="306" y="433" fontFamily="DM Sans,sans-serif" fontSize="8" fill="#6a6050" textAnchor="middle" letterSpacing="1">SEMI OUTDOOR</text>
-      <rect x="4" y="464" width="450" height="5" fill="#6a6050" />
-      <rect x="170" y="459" width="80" height="14" rx="2" fill="#c8a96e" opacity=".75" />
-      <text x="210" y="458" fontFamily="DM Sans,sans-serif" fontSize="7" fill="#c8a96e" textAnchor="middle" letterSpacing="1">PINTU</text>
-      <rect x="4" y="470" width="450" height="522" fill="none" stroke="#6a6050" strokeWidth="4" />
-      <text x="230" y="750" fontFamily="DM Sans,sans-serif" fontSize="9" fill="#6a6050" textAnchor="middle" letterSpacing="2">OUTDOOR / TERAS</text>
-      <rect x="354" y="478" width="92" height="506" fill="none" stroke="#6a6050" strokeWidth="2.5" />
-      <text x="400" y="968" fontFamily="DM Sans,sans-serif" fontSize="7.5" fill="#6a6050" textAnchor="middle" letterSpacing="1">LUAR</text>
-
-      {/* Tables */}
-      {meja.map(m => {
-        const r = resData[m.id], occ = !!r
-        const c = occ ? '#8b3a3a' : '#c8a96e'
-        const f = occ ? 'rgba(139,58,58,0.18)' : 'rgba(200,169,110,0.12)'
-        const sps = m.kursi <= 2 ? 1 : 2
-        const cW = 9, cH = 6, pad = 4
-        const chairs = []
-        for (let i = 0; i < sps; i++) {
-          const cx = m.x + (i + 1) * m.w / (sps + 1) - cW / 2
-          chairs.push(<rect key={`ct${i}`} x={cx} y={m.y - cH - pad} width={cW} height={cH} rx="1.5" fill={c} opacity=".42" />)
-          chairs.push(<rect key={`cb${i}`} x={cx} y={m.y + m.h + pad} width={cW} height={cH} rx="1.5" fill={c} opacity=".42" />)
-        }
-        if (m.kursi >= 4) {
-          chairs.push(<rect key="cl" x={m.x - cH - pad} y={m.y + m.h / 2 - cW / 2} width={cH} height={cW} rx="1.5" fill={c} opacity=".42" />)
-          chairs.push(<rect key="cr" x={m.x + m.w + pad} y={m.y + m.h / 2 - cW / 2} width={cH} height={cW} rx="1.5" fill={c} opacity=".42" />)
-        }
-        const guestShort = r?.nama_tamu ? (r.nama_tamu.length > 10 ? r.nama_tamu.slice(0, 9) + '…' : r.nama_tamu) : null
-        return (
-          <g key={m.id} style={{ cursor: isAdmin ? 'pointer' : 'default' }} onClick={() => isAdmin && onMejaClick(m.id)}>
-            {chairs}
-            <rect className="tbody-rect" x={m.x} y={m.y} width={m.w} height={m.h} rx="4" fill={f} stroke={c} strokeWidth="1.8" />
-            <text x={m.x + m.w / 2} y={m.y + 12} fontFamily="DM Sans,sans-serif" fontSize="8" fill={c} textAnchor="middle" fontWeight="600">{m.nama}</text>
-            {guestShort ? (
-              <>
-                <text x={m.x + m.w / 2} y={m.y + m.h / 2 + 2} fontFamily="DM Sans,sans-serif" fontSize="8" fill="#f0ead6" textAnchor="middle">{guestShort}</text>
-                {r.jam && <text x={m.x + m.w / 2} y={m.y + m.h / 2 + 13} fontFamily="DM Sans,sans-serif" fontSize="7" fill={c} textAnchor="middle">{r.jam.slice(0, 5)}</text>}
-              </>
-            ) : (
-              <text x={m.x + m.w / 2} y={m.y + m.h / 2 + 5} fontFamily="DM Sans,sans-serif" fontSize="8" fill={c} textAnchor="middle">Kosong</text>
-            )}
-            <circle cx={m.x + m.w - 8} cy={m.y + 8} r="4" fill={c} />
-          </g>
-        )
-      })}
-    </svg>
-  )
-}
+                      }
