@@ -2,8 +2,8 @@ import './globals.css'
 import { ThemeProvider } from './providers'
 
 export const metadata = {
-  title: 'Cek Ketersediaan · Ramadan 1446 H',
-  description: 'Tea.Co+ — Cek ketersediaan untuk reservasi selama Ramadan 1446 H',
+  title: 'T3ACO+',
+  description: 'Tea.Co+ — Menu Favorit & Lokasi Kami Ada di Sini',
 }
 
 export default function RootLayout({ children }) {
