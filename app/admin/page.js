@@ -58,13 +58,15 @@ function mkdk(y, m, d) { return `${y}-${pad(m + 1)}-${pad(d)}` }
 // ================================================================
 //  LOGIN PAGE COMPONENT (full screen, shown before admin content)
 // ================================================================
-function LoginPage({ onLogin }: { onLogin: () => void }) {
+
+
+function LoginPage({ onLogin }) {
   const [user, setUser] = useState('')
   const [pass, setPass] = useState('')
   const [err, setErr] = useState('')
   const [loading, setLoading] = useState(false)
   const [showPass, setShowPass] = useState(false)
-  const passRef = useRef<HTMLInputElement>(null)
+  const passRef = useRef(null)
 
   const handleSubmit = async () => {
     setErr('')
@@ -83,7 +85,7 @@ function LoginPage({ onLogin }: { onLogin: () => void }) {
     setLoading(false)
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e) => {
     if (e.key === 'Enter') handleSubmit()
   }
 
@@ -275,7 +277,7 @@ export default function AdminPage() {
   // null  = belum dicek (hydrating)
   // false = belum login
   // true  = sudah login
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
+  const [isAdmin, setIsAdmin] = useState(null)
 
   const [view, setView] = useState('calendar')
   const [calYear, setCalYear] = useState(today.getFullYear())
