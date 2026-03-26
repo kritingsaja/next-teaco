@@ -31,7 +31,7 @@ export default function Home() {
           <p className="text-sm text-stone-500 dark:text-stone-400 max-w-md">
             Nikmati menu spesial Ramadan kami. Lihat buku menu lengkap di bawah ini.
           </p>
-          
+          <a
             href="/reservasi"
             className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gold-400 hover:bg-gold-500 text-white text-sm font-medium transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-gold-400/30"
           >
