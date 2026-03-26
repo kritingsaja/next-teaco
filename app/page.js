@@ -4,18 +4,34 @@ export default function Home() {
   const waLink = 'https://api.whatsapp.com/send/?phone=628112777555&text&type=phone_number&app_absent=0'
   const mapsLink = 'https://share.google/wHx2OWWrK6WguJc1A'
 
+  const batikSvg = `<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80'>
+    <rect width='80' height='80' fill='none'/>
+    <g opacity='0.18' stroke='%23c8a96e' stroke-width='0.6' fill='none'>
+      <path d='M40 10 C50 20, 60 15, 70 25 C60 35, 50 30, 40 40 C30 30, 20 35, 10 25 C20 15, 30 20, 40 10Z'/>
+      <path d='M40 10 C50 20, 60 15, 70 25 C60 35, 50 30, 40 40 C30 30, 20 35, 10 25 C20 15, 30 20, 40 10Z' transform='translate(0,40)'/>
+      <path d='M40 10 C50 20, 60 15, 70 25 C60 35, 50 30, 40 40 C30 30, 20 35, 10 25 C20 15, 30 20, 40 10Z' transform='translate(40,20)'/>
+      <circle cx='40' cy='25' r='4'/>
+      <circle cx='40' cy='65' r='4'/>
+      <circle cx='20' cy='45' r='2.5'/>
+      <circle cx='60' cy='45' r='2.5'/>
+      <circle cx='0' cy='25' r='2.5'/>
+      <circle cx='80' cy='25' r='2.5'/>
+      <line x1='40' y1='0' x2='40' y2='80'/>
+      <line x1='0' y1='40' x2='80' y2='40'/>
+      <path d='M10 10 Q20 0 30 10 Q40 20 50 10 Q60 0 70 10'/>
+      <path d='M10 70 Q20 60 30 70 Q40 80 50 70 Q60 60 70 70'/>
+    </g>
+  </svg>`
+
+  const batikBg = `url("data:image/svg+xml,${batikSvg}")`
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <div
-        className="fixed inset-0 pointer-events-none z-50 opacity-20"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E")`,
-        }}
-      />
+    <div className="min-h-screen flex flex-col" style={{ backgroundImage: batikBg, backgroundSize: '80px 80px' }}>
+      {/* Overlay biar konten tetap terbaca */}
+      <div className="fixed inset-0 pointer-events-none z-0" style={{ background: 'rgba(15,14,11,0.88)' }} />
 
-      <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12 flex flex-col gap-8">
+      <main className="relative z-10 flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12 flex flex-col gap-8">
 
-        {/* Hero Section */}
         <section className="text-center py-4 flex flex-col items-center gap-3">
           <p className="text-xs tracking-[0.25em] uppercase text-stone-400 dark:text-stone-500">
             Selamat Datang di
@@ -38,7 +54,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Menu PDF Embed */}
         <section className="flex flex-col gap-3">
           <h2 className="text-sm font-medium tracking-widest uppercase text-stone-400 dark:text-stone-500 text-center">Buku Menu</h2>
           <div className="rounded-2xl overflow-hidden border border-stone-200 dark:border-dark-50 shadow-sm bg-white dark:bg-dark-100">
@@ -52,11 +67,10 @@ export default function Home() {
 
       </main>
 
-      <footer className="border-t border-stone-200 dark:border-dark-50 py-6 px-4 text-center">
+      <footer className="relative z-10 border-t border-stone-200 dark:border-dark-50 py-6 px-4 text-center">
         <p className="text-xs text-stone-400 dark:text-stone-600 tracking-wider uppercase">Tea Co + · CS: +62 811-2777-555</p>
       </footer>
 
-      {/* Admin FAB */}
       <div className="fixed bottom-5 right-5 z-40 group">
         <a href="/admin" className="flex items-center justify-center w-12 h-12 rounded-full bg-white dark:bg-dark-100 border border-stone-200 dark:border-dark-50 hover:border-gold-400 text-stone-400 dark:text-stone-500 hover:text-gold-400 shadow-md transition-all duration-200 hover:-translate-y-1 text-lg" title="Admin Login">⚙️</a>
         <span className="absolute right-14 bottom-1/2 translate-y-1/2 bg-white dark:bg-dark-100 border border-stone-200 dark:border-dark-50 text-stone-600 dark:text-stone-400 text-xs px-2.5 py-1 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-200 shadow-sm">Admin Login</span>
