@@ -2,7 +2,6 @@ import Header from '../components/Header'
 import InfoBar from '../components/InfoBar'
 
 export default function Home() {
-  // Convert Google Drive view link to embed link
   const driveFileId = '1u-eJ2L6tk4EruWzmkm-bc_rLIZ8vog81'
   const embedUrl = `https://drive.google.com/file/d/${driveFileId}/preview`
 
@@ -32,17 +31,9 @@ export default function Home() {
           <p className="text-sm text-stone-500 dark:text-stone-400 max-w-md">
             Nikmati menu spesial Ramadan kami. Lihat buku menu lengkap di bawah ini.
           </p>
-          {/* CTA ke reservasi jika masih dipakai */}
           
             href="/reservasi"
-            className="
-              mt-2 inline-flex items-center gap-2
-              px-5 py-2.5 rounded-full
-              bg-gold-400 hover:bg-gold-500
-              text-white text-sm font-medium
-              transition-all duration-200
-              hover:-translate-y-0.5 hover:shadow-lg hover:shadow-gold-400/30
-            "
+            className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gold-400 hover:bg-gold-500 text-white text-sm font-medium transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-gold-400/30"
           >
             Reservasi Sekarang →
           </a>
@@ -53,12 +44,7 @@ export default function Home() {
           <h2 className="text-sm font-medium tracking-widest uppercase text-stone-400 dark:text-stone-500 text-center">
             Buku Menu
           </h2>
-          <div className="
-            rounded-2xl overflow-hidden
-            border border-stone-200 dark:border-dark-50
-            shadow-sm dark:shadow-none
-            bg-white dark:bg-dark-100
-          ">
+          <div className="rounded-2xl overflow-hidden border border-stone-200 dark:border-dark-50 shadow-sm dark:shadow-none bg-white dark:bg-dark-100">
             <iframe
               src={embedUrl}
               className="w-full"
@@ -93,25 +79,12 @@ export default function Home() {
       <div className="fixed bottom-5 right-5 z-40 group">
         
           href="/admin"
-          className="
-            flex items-center justify-center
-            w-12 h-12 rounded-full
-            bg-white dark:bg-dark-100
-            border border-stone-200 dark:border-dark-50
-            hover:border-gold-400 dark:hover:border-gold-400
-            text-stone-400 dark:text-stone-500
-            hover:text-gold-400
-            shadow-md dark:shadow-none
-            transition-all duration-200
-            hover:-translate-y-1
-            hover:shadow-xl dark:hover:shadow-gold-400/10
-            text-lg
-          "
+          className="flex items-center justify-center w-12 h-12 rounded-full bg-white dark:bg-dark-100 border border-stone-200 dark:border-dark-50 hover:border-gold-400 dark:hover:border-gold-400 text-stone-400 dark:text-stone-500 hover:text-gold-400 shadow-md dark:shadow-none transition-all duration-200 hover:-translate-y-1 hover:shadow-xl dark:hover:shadow-gold-400/10 text-lg"
           title="Admin Login"
         >
           ⚙️
         </a>
-        <span className="
+        <span className={`
           absolute right-14 bottom-1/2 translate-y-1/2
           bg-white dark:bg-dark-100
           border border-stone-200 dark:border-dark-50
@@ -122,7 +95,7 @@ export default function Home() {
           pointer-events-none
           transition-all duration-200
           shadow-sm
-        ">
+        `}>
           Admin Login
         </span>
       </div>
